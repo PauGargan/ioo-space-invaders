@@ -18,7 +18,7 @@ public class Tablero {
         {
         		public int compare(PuntajePartida o1, PuntajePartida o2)
         		{
-        			return	o2.getpuntaje() - o1.getpuntaje();
+        			return	o2.getPuntaje() - o1.getPuntaje();
         		}
         });
         

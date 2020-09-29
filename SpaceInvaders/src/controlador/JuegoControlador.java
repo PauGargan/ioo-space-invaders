@@ -14,10 +14,10 @@ import modelo.Tablero;
 public class JuegoControlador {
 
 
-    public static  JuegoControlador instancia; // singleton un solo objeto controlador
+    private final int TAMANIO_FLOTA_NAVES_INVASORAS = 15;
+    
+	public static  JuegoControlador instancia; // singleton un solo objeto controlador
 	private String dificultad;
-    private int puntaje;
-    private int puntajeVidaNueva;
     private int cantVida;
     private int nivel = 1;
     private int navesEnemigas;
@@ -28,19 +28,24 @@ public class JuegoControlador {
     private Jugador jugador;
     private Tablero tablero = new Tablero();
     private AreaDeJuego area= new AreaDeJuego();
+    private PuntajePartida puntajePartida;
     
     
     
-    public   JuegoControlador() { } 
+    public JuegoControlador() { } 
 
+    public void inicializarJuego(String nombre) {
+    	nombreJugador = nombre;
+    	puntajePartida = new PuntajePartida();
+    }
     
-    public void comenzarJuego(int nivel ) {
+    public void comenzarJuego(int nivel) {
     	
         //Nivel
     	this.nivel = nivel;
     	
         //NavesInvasoras
-    	naves = new ArrayList<NaveInvasora>();
+    	iniciarNavesInvasoras();
         
         //Jugador
         jugador = new Jugador(this.cantVida);
@@ -50,10 +55,7 @@ public class JuegoControlador {
         bloques = new ArrayList<Bloque>();
         
         //Disparos
-              
-    	
     	proyectiles = new ArrayList<Proyectil>();
-    	
 
     }
 
@@ -108,8 +110,7 @@ public class JuegoControlador {
     	if (paso)
     	{
     		nivel++;
-    		this.puntaje += 200;
-    		this.puntajeVidaNueva += 200;
+    		this.puntajePartida.incrementarPuntaje(200);
     		incrementarVida(); // chequear
     		comenzarJuego(nivel);
     	}
@@ -124,9 +125,10 @@ public class JuegoControlador {
     }
 
     public void incrementarVida() {
-		if(puntajeVidaNueva > 499)
+		if(this.puntajePartida.mereceNuevaVida()) {
 			this.cantVida++;
-		puntajeVidaNueva = 0;
+			this.puntajePartida.restarPuntajeParaVida();
+		}
     }
 
 
@@ -134,13 +136,13 @@ public class JuegoControlador {
     		//paraque?
     }
 
-    public void registrarPartida( String jugador, int puntaje) {
+ /*   public void registrarPartida( String jugador, int puntaje) {
         PuntajePartida puntajep = new PuntajePartida(puntaje,jugador);
         tablero.agregarOrdenado(puntajep);
-    }
+    }*/
     
     public int getPuntaje() {
-        return puntaje;
+        return this.puntajePartida.getPuntaje();
     }
     
     public Tablero GetTablero() {
@@ -157,6 +159,15 @@ public class JuegoControlador {
          	bloques.add(bloque);        	
          }
     	 
+    }
+    
+    public void iniciarNavesInvasoras() {
+    	this.naves = new ArrayList<NaveInvasora>();
+    	
+    	for(int i=0; i<TAMANIO_FLOTA_NAVES_INVASORAS; i++) {
+    		NaveInvasora n = new NaveInvasora();
+    		this.naves.add(n);
+    	}
     }
 
     public void avanzarVertical() {

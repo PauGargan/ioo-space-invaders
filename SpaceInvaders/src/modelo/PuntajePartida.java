@@ -4,20 +4,33 @@ package modelo;
 
 public class PuntajePartida {
 
-    private String jugador;
+	public static final int PUNTOS_PASAR_NIVEL = 200;
+	public static final int PUNTOS_MATAR_NAVE = 10;
+	public static final int PUNTOS_PARA_NUEVA_VIDA = 500;
+	
     private int puntaje;
+    private int puntajeParaVida;
     
-    public PuntajePartida(int puntajejugador, String nombrejugador) {
-    	puntaje = puntajejugador;
-    	jugador = nombrejugador;
+    public PuntajePartida() {
+    	puntaje = 0;
+    	puntajeParaVida = 0;
     }
 
-	public int getpuntaje() {
+	public int getPuntaje() {
 		return this.puntaje;
 	}
-
-	public String getNombreJugador() {
-		return this.jugador;
+	
+	public void incrementarPuntaje(int puntos) {
+		this.puntaje += puntos;
+		this.puntajeParaVida += puntos;
+	}
+	
+	public void restarPuntajeParaVida() {
+		this.puntajeParaVida =- PUNTOS_PARA_NUEVA_VIDA;
+	}
+	
+	public boolean mereceNuevaVida() {
+		return puntajeParaVida >= PUNTOS_PARA_NUEVA_VIDA;
 	}
 }
 
