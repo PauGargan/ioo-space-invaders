@@ -25,6 +25,7 @@ public class VentanaJuego extends JFrame {
 	private static final long serialVersionUID = 6705201031723404827L;
 	private static final int VENTANA_ALTO = 700;
 	private static final int VENTANA_ANCHO = 900;
+	private static final int VELOCIDAD_JUGADOR = 20;
 	
 	private Timer timer;
 	private ArrayList<JLabel> naves = new ArrayList<>();
@@ -125,20 +126,21 @@ public class VentanaJuego extends JFrame {
 				
 				//System.out.println(e.getKeyCode()); // para saber que codigo es
 				if( e.getKeyCode() == 39) // me muevo a la derecha
-				{   int x = JLjugador.getX() +10;
-					if( x<1105 )
+				{   int x = JLjugador.getX() + VELOCIDAD_JUGADOR;
+					if( x < VENTANA_ANCHO - 85 )
 						JLjugador.setBounds(x, JLjugador.getY(), JLjugador.getWidth(), JLjugador.getHeight());
 					}
 					else
 					if(e.getKeyCode() == 37) // izq
-					{	int x = JLjugador.getX() -10;
-						if(x>15)
+					{	int x = JLjugador.getX() - VELOCIDAD_JUGADOR;
+						if(x > 5)
 							JLjugador.setBounds(x, JLjugador.getY(), JLjugador.getWidth(), JLjugador.getHeight());
 					}
 			}
 		});
 		
-		}
+	}
+	
 	class ManejoTimer implements ActionListener{
 
 		@Override
