@@ -1,17 +1,20 @@
 package modelo;
 
-public class Jugador {
+import view.JugadorView;
+
+public class Jugador extends ObjetoMovil {
 	
-	private final int X_INICIAL = 50;
-	private final int Y_INICIAL = 50;
+	public static final int POSICION_INICIAL_X = 400;
+	public static final int POSICION_INICIAL_Y = 600;
+	public static final int VELOCIDAD = 5;
+	
+	private final int VIDA_INICIAL = 3;
+	
 	private int vidas;
-	private int posicionX;
-	private int posicionY;
 	
-	public Jugador(int vidas) {
-		this.vidas = vidas;
-		this.posicionX = X_INICIAL;
-		this.posicionY = Y_INICIAL;
+	public Jugador() {
+		super(POSICION_INICIAL_X,POSICION_INICIAL_Y);
+		this.vidas = VIDA_INICIAL;
 	}
 	
 	public boolean siVive() {
@@ -39,23 +42,8 @@ public class Jugador {
 	public void moverDer() {
 		this.posicionX =+ 5;
 	}
-
-	public int getPosicionX() {
-		return posicionX;
-	}
-
-	public void setPosicionX(int posicionX) {
-		this.posicionX = posicionX;
-	}
-
-	public int getPosicionY() {
-		return posicionY;
-	}
-
-	public void setPosicionY(int posicionY) {
-		this.posicionY = posicionY;
-	}
 	
-	
-	
+	public JugadorView toView() {
+		return new JugadorView(posicionX, posicionY, VELOCIDAD);
+	}
 }

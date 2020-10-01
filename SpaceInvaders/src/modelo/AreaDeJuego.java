@@ -4,8 +4,8 @@ package modelo;
 import java.util.*;
 
 public class AreaDeJuego {
-    private int alto = 900 ;
-    private int ancho = 1200 ;
+    public static int alto = 800 ;
+    public static int ancho = 900 ;
   
     public AreaDeJuego() {
     }

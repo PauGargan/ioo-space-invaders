@@ -19,7 +19,7 @@ public class VentanaNombre extends JFrame {
 	private JLabel rotulo;
 	private JButton JBAceptar;
 	private JTextField JTexto;
-	private JuegoControlador juego= new JuegoControlador();
+	//private JuegoControlador juego= new JuegoControlador();
 	
 	public static void main(String[] args) {
 			new VentanaNombre();
@@ -89,7 +89,7 @@ public class VentanaNombre extends JFrame {
 							"Informacion necesaria",JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				juego.registrarPuntaje(JTexto.getText(), juego.getPuntaje());
+	//			juego.registrarPuntaje(JTexto.getText(), juego.getPuntaje());
 				VentanaTablero tablero  = new VentanaTablero();
 				tablero.setVisible(true);
 				tablero.setLocationRelativeTo(null);

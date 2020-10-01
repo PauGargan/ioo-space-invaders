@@ -1,8 +1,8 @@
 package gui;
 
 
+import java.awt.Color;
 import java.awt.Container;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -16,7 +16,9 @@ import javax.swing.Timer;
 import javax.swing.WindowConstants;
 
 import controlador.JuegoControlador;
-import modelo.Bloque;
+import view.BloqueView;
+import view.JugadorView;
+import view.NaveInvasoraView;
 
 
 public class VentanaJuego extends JFrame {
@@ -28,7 +30,7 @@ public class VentanaJuego extends JFrame {
 	private static final int VELOCIDAD_JUGADOR = 20;
 	
 	private Timer timer;
-	private ArrayList<JLabel> naves = new ArrayList<>();
+	private ArrayList<ArrayList<JLabel>> JLnaves = new ArrayList<ArrayList<JLabel>>();
 	private JLabel JLjugador;
 	private JLabel JLpuntaje, JLvidas, JLbloque;
 	private ArrayList<JLabel> JLproyectil = new ArrayList<>();
@@ -38,9 +40,9 @@ public class VentanaJuego extends JFrame {
 	private int contador = 0;
 	
 	// CONSTRUCTOR
-	public VentanaJuego (JuegoControlador j) {
+	public VentanaJuego () {
 		configurar();
-		juego = j;
+		//juego = j;
 		eventos();
 		setLocationRelativeTo(null);
 		setSize(VENTANA_ANCHO, VENTANA_ALTO); //  this.setSize(juego.getAnchoArea(),juego.getAltoArea());
@@ -58,16 +60,15 @@ public class VentanaJuego extends JFrame {
 		
 		
 		//JUGADOR
+		
 		JLjugador = new JLabel("Jugador");
 		JLjugador.setIcon(new javax.swing.ImageIcon(getClass().getResource("jugador" + ".png")));
-		JLjugador.setBounds(400,VENTANA_ALTO-100,80,80); // cambiar por juego.getPosXJugador()
+		JugadorView j = JuegoControlador.getInstancia().getJugador();
+		JLjugador.setBounds(j.getPosicionX(),j.getPosicionY(),80,80); 
 		JLjugador.setVisible(true);
-		
-		
 		
 		//PUNTAJE
 		JLpuntaje = new JLabel("Puntaje: 00" ); //String.valueOf(juego.getPuntaje()  CAMBIAR
-	//	JLpuntaje.setText("Puntaje: " + String.valueOf(juego.getPuntaje()));
 		JLpuntaje.setBounds(VENTANA_ANCHO-150, 0, 170, 25); 
 		JLpuntaje.setForeground(new java.awt.Color(21,170,215));
 		JLpuntaje.setFont(new java.awt.Font("Tahoma",3,20));
@@ -86,17 +87,35 @@ public class VentanaJuego extends JFrame {
 		
 		
 		//BLOQUES
-		for (int i = 0; i <= 5; i++) {
-			JLabel JLbloque = new JLabel("Bloque");
-			JLbloque.setIcon(new javax.swing.ImageIcon(	getClass().getResource("bloque" + ".png")));
-			JLbloques.add(JLbloque);
+		ArrayList<BloqueView> bloques = JuegoControlador.getInstancia().getMuro();
+		for(BloqueView b : bloques) {
+			JLabel JLbloque = new JLabel();
+		//	JLbloque.setIcon(new javax.swing.ImageIcon(	getClass().getResource("bloque" + ".png")));
+			JLbloque.setBounds(b.getPosicionX(),b.getPosicionY(),b.getTamanio(),b.getTamanio());
+			JLbloque.setOpaque(true);
+			JLbloque.setBackground(new Color(255, 76, 76, b.getProteccion()));
 			JLbloque.setVisible(true);
-			int bloqueX = i * (80 + 50);
-			System.out.println(bloqueX);
-			JLbloque.setBounds(bloqueX,VENTANA_ALTO-200,80,80);
+			JLbloques.add(JLbloque);
 			c.add(JLbloque);
-			
 		}
+		
+		
+		// NAVES INVASORAS
+		//ArrayList<ArrayList<NaveInvasoraView>> flotaNaves = JuegoControlador.getInstancia().getNavesInvasoras();
+		ArrayList<ArrayList<NaveInvasoraView>> flotaNaves = JuegoControlador.getInstancia().getFlotaInvasora().getNaves();
+		
+		for(int col=0; col < flotaNaves.size(); col++) {
+			this.JLnaves.add(new ArrayList<JLabel>());
+			for(int fil=0; fil < flotaNaves.get(fil).size(); fil++) {
+				JLabel JLnave = new JLabel();
+				JLnave.setIcon(new javax.swing.ImageIcon(getClass().getResource("naveInvasora.png")));
+				JLnave.setBounds(flotaNaves.get(col).get(fil).getPosicionX(),flotaNaves.get(col).get(fil).getPosicionY(),60,60);
+				JLnave.setVisible(true);
+				c.add(JLnave);
+				this.JLnaves.get(col).add(JLnave);
+			}
+		}
+		
 		
 		c.add(JLjugador);
 		c.add(JLpuntaje);
@@ -124,18 +143,26 @@ public class VentanaJuego extends JFrame {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				
-				//System.out.println(e.getKeyCode()); // para saber que codigo es
-				if( e.getKeyCode() == 39) // me muevo a la derecha
-				{   int x = JLjugador.getX() + VELOCIDAD_JUGADOR;
-					if( x < VENTANA_ANCHO - 85 )
+				if( e.getKeyCode() == 39) { // me muevo a la derecha
+					
+					int x = JuegoControlador.getInstancia().moverJugadorDer();
+					
+					if( x < VENTANA_ANCHO - 85 ) {
+						
 						JLjugador.setBounds(x, JLjugador.getY(), JLjugador.getWidth(), JLjugador.getHeight());
+					} else {
+						JuegoControlador.getInstancia().moverJugadorIzq();
 					}
-					else
-					if(e.getKeyCode() == 37) // izq
-					{	int x = JLjugador.getX() - VELOCIDAD_JUGADOR;
-						if(x > 5)
-							JLjugador.setBounds(x, JLjugador.getY(), JLjugador.getWidth(), JLjugador.getHeight());
+					
+				} else if(e.getKeyCode() == 37) { // me muevo a la izq	
+					
+					int x = JuegoControlador.getInstancia().moverJugadorIzq();
+					if(x > 5) {
+						JLjugador.setBounds(x, JLjugador.getY(), JLjugador.getWidth(), JLjugador.getHeight());
+					} else {
+						JuegoControlador.getInstancia().moverJugadorIzq();
 					}
+				}
 			}
 		});
 		
@@ -146,44 +173,70 @@ public class VentanaJuego extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			
-			if(juego.siGameOver()){
+	/*		if(juego.siGameOver()){
 				timer.stop();
 				JOptionPane.showMessageDialog(null,juego.getPuntaje()+" puntos.", "GAME OVER",JOptionPane.INFORMATION_MESSAGE);
 				VentanaNombre nombre = new VentanaNombre();
 				nombre.setVisible(true);
 				nombre.setLocationRelativeTo(null);
 				dispose();
-			}
-			juego.moverEnemigo();
+			}*/
+			
 			// juego.actualizarDisparos();
 			//actualizarDisparos();
 			
-			juego.incrementarNivel();
+		//	juego.incrementarNivel();
 			
 			//actualizarEnem();
 			//actualizarPosDefensor();
-			Bloque(); 
+			moverNavesEnemigas();
+			actualizarMuro(); // ex Bloque()
 			
-			JLpuntaje.setText("Puntaje: " + String.valueOf(juego.getPuntaje()));
-			JLvidas.setText("Vidas: " + String.valueOf(juego.getVida()));
+//			JLpuntaje.setText("Puntaje: " + String.valueOf(juego.getPuntaje()));
+//			JLvidas.setText("Vidas: " + String.valueOf(juego.getVida()));
 			
-			if (contador == velocidad) {
+/*			if (contador == velocidad) {
 				juego.dispararEnemigo();
 				contador=0;
 			}
-			contador++;
+			contador++; */
 		}
 	}
 	
-	private void Bloque(){
-		for (Bloque bloques : juego.getBloque()) {
-			if(bloques.siVivo()){
+	private void actualizarMuro(){
+		ArrayList<BloqueView> bloques = JuegoControlador.getInstancia().getMuro();
+		
+		for (BloqueView bloque : bloques) {
+			JLabel gBloque = JLbloques.get(bloques.indexOf(bloque));
+			if(bloque.getProteccion() > 0) {
 				
-				JLbloques.get(juego.getBloque().indexOf(bloques)).setBounds(bloques.getPosX(), bloques.getPosY(), 50,50);
-				JLbloques.get(juego.getBloque().indexOf(bloques)).setText("Muro " + juego.getBloque().indexOf(bloques));
+				gBloque.setBounds(bloque.getPosicionX(), bloque.getPosicionY(), 
+						bloque.getTamanio(),bloque.getTamanio());
+				gBloque.setBackground(new Color(255, 76, 76, bloque.getProteccion()));
+			} else {
+				gBloque.setVisible(false);
 			}
-			else
-				JLbloques.get(juego.getBloque().indexOf(bloques)).setVisible(false);
+		}
+	}
+	
+	private void moverNavesEnemigas(){
+		JuegoControlador.getInstancia().moverEnemigo();
+		ArrayList<ArrayList<NaveInvasoraView>> navesView = JuegoControlador.getInstancia().getFlotaInvasora().getNaves();
+		
+		for(int col=0; col < navesView.size(); col++) {
+			for(int fil=0; fil < navesView.get(fil).size(); fil++) {
+				
+				NaveInvasoraView naveView = navesView.get(col).get(fil);
+				JLabel gNave = JLnaves.get(col).get(fil);
+				if(naveView.getEstado()) {
+					
+					gNave.setBounds(naveView.getPosicionX(), naveView.getPosicionY(), 60, 60);
+							//naveView.getTamanio(),naveView.getTamanio());
+					//gBloque.setBackground(new Color(255, 76, 76, bloque.getProteccion()));
+				} else {
+					gNave.setVisible(false);
+				}
+			}
 		}
 	}
 }

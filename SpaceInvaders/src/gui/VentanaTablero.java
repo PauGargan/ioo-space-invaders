@@ -60,7 +60,7 @@ public class VentanaTablero extends JFrame {
 		tablero.addColumn("Puesto");
 		tablero.addColumn("Nombre");
 		tablero.addColumn("Puntaje");
-		juego = new JuegoControlador();
+	//	juego = new JuegoControlador();
 		int i = 1;
 		//for (PuntajePartida puntaje: juego.GetTablero().getTablero() ) {
 			//Object[] row = { i++, puntaje.getNombreJugador(),puntaje.getpuntaje()};

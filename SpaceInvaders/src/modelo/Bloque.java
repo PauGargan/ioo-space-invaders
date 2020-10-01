@@ -1,28 +1,34 @@
 package modelo;
 
 
-import java.util.*;
+import view.BloqueView;
 
 
 public class Bloque {
 
+	public static final int BLOQUES_POR_MURO = 5;
+	public static final int ESPACIO_ENTRE_BLOQUES = 50;
+	public static final int TAMANIO_LADO = 80;
+	public static final int POSICION_Y = 500;
+	private final int PROTECCION_MAX = 100;	
+	private final int DANIO_ENEMIGO = 5;
+	private final int DANIO_AMIGO = 10;
+	
     private int proteccion;
     private int posicionX;
-    private int posicionY; // determinar posicion!!!
-    private int ancho;
-    private int alto;
-    private boolean vivo;
+    private int posicionY; 
+    private int ancho = 80;
+    private int alto = 80;
     
     public Bloque(int posicionX) {
-    	proteccion = 20;
-    	vivo = true;
+    	proteccion = PROTECCION_MAX;
     	this.posicionX = posicionX;
+    	this.posicionY = POSICION_Y;
     	
     }
 
     public void iniciarBloque() {
-    	proteccion = 20;
-        vivo = true;
+    	proteccion = PROTECCION_MAX;
     }
 
      public void recibiDisparo(Proyectil proyectil) {
@@ -30,24 +36,38 @@ public class Bloque {
     	 if(proyectil.getPosicionX() == this.posicionX && proyectil.getPosicionY() == this.posicionY)
     	 {
     		 if(proyectil.getSentido() == 1) // arriba
-    			 this.proteccion = this.proteccion -2;
+    			 this.proteccion -= DANIO_AMIGO;
     		 else
-    			 this.proteccion -= this.proteccion;
-    		 if(proteccion <1)
-    			 this.vivo = false;
+    			 this.proteccion -= DANIO_ENEMIGO;
     	 }    	  	 
     }
 
 
     public boolean siVivo() {
-        return this.vivo;
-        }
+        return this.proteccion > 0;
+    }
         
-      public int getPosX() {
-            return posicionX;
+    public int getPosX() {
+        return posicionX;
     }
       
-      public int getPosY() {
-          return posicionY;
-  }
+    public int getPosY() {
+        return posicionY;
+    }
+    
+    public int getProteccion() {
+        return proteccion;
+    }
+    
+    public void setProteccion(int proteccion) {
+        this.proteccion = proteccion;
+    }
+    
+    public void reducirProteccion (int cant) {
+    	this.proteccion -= cant;
+    }
+    
+    public BloqueView toView() {
+    	return new BloqueView(this.posicionX, this.posicionY, this.proteccion, TAMANIO_LADO);
+    }
 }
