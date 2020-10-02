@@ -34,7 +34,6 @@ public class Proyectil {
 	}
 	
 	public void avanzar() {
-		System.out.println("AVANZAR");
 		if(this.sentido == SENTIDO_ASC && posicionY > 0) {
 			this.posicionY -= velocidad;
 		} else if (this.sentido == SENTIDO_DESC && posicionY < AreaDeJuego.alto) {
@@ -69,7 +68,7 @@ public class Proyectil {
 	}
 	
 	public ProyectilView toView() {
-		return new ProyectilView(this.posicionX, this.posicionY, this.estado);
+		return new ProyectilView(this.posicionX, this.posicionY, this.estado, this.sentido);
 	}
 	
 }

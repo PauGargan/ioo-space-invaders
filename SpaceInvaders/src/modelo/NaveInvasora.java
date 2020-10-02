@@ -14,7 +14,7 @@ public class NaveInvasora extends ObjetoMovil {
 		super(x,y);
 		this.vivo = true;
 		this.sentido = ObjetoMovil.DIR_DERECHA;
-		this.proyectil = new Proyectil(x / 2, y, Proyectil.SENTIDO_DESC);
+		this.proyectil = new Proyectil(x + TAMANIO/2, y + TAMANIO, Proyectil.SENTIDO_DESC);
 	}
 	
 	public boolean siVive() {
@@ -27,8 +27,8 @@ public class NaveInvasora extends ObjetoMovil {
 	}
 	
 	public void disparar() {
-		this.proyectil.setPosicionX(this.posicionX);
-		this.proyectil.setPosicionY(this.posicionY);
+		this.proyectil.setPosicionX(this.posicionX + TAMANIO/2);
+		this.proyectil.setPosicionY(this.posicionY + TAMANIO);
 		this.proyectil.activar();
 	}
 	

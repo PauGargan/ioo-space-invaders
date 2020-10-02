@@ -31,15 +31,12 @@ public class Bloque {
     	proteccion = PROTECCION_MAX;
     }
 
-     public void recibiDisparo(Proyectil proyectil) {
+     public void recibiDisparo(int sentido) {
         
-    	 if(proyectil.getPosicionX() == this.posicionX && proyectil.getPosicionY() == this.posicionY)
-    	 {
-    		 if(proyectil.getSentido() == 1) // arriba
-    			 this.proteccion -= DANIO_AMIGO;
-    		 else
-    			 this.proteccion -= DANIO_ENEMIGO;
-    	 }    	  	 
+	 	if(sentido == Proyectil.SENTIDO_ASC) // arriba
+			 this.proteccion -= DANIO_AMIGO;
+		 else
+			 this.proteccion -= DANIO_ENEMIGO;    	  	 
     }
 
 

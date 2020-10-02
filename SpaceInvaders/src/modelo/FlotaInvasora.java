@@ -72,6 +72,18 @@ public class FlotaInvasora {
     		}
 		}
 	}
+	
+	public boolean fueDestruida() {
+		boolean result = true;
+		for(int i=0; i < this.naves.size(); i++) {
+			for(int j=0; j < this.naves.get(i).size(); j++) {
+				if(this.naves.get(i).get(j).siVive()) {
+					result = false;
+				}
+			}
+		}
+		return result;
+	}
 
 	public int getSentido() {
 		return sentido;

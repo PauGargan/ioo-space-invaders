@@ -26,7 +26,7 @@ public class JuegoControlador {
     private int nivel = 1;
     private FlotaInvasora flotaInvasora;
     private ArrayList <Bloque> bloques;
-    private ArrayList <Proyectil> proyectiles;
+    //private ArrayList <Proyectil> proyectiles;
     private Jugador jugador;
     private Tablero tablero = new Tablero();
     private AreaDeJuego area= new AreaDeJuego();
@@ -36,21 +36,20 @@ public class JuegoControlador {
     
     
     private JuegoControlador() { 
-    	comenzarJuego(1);
+    	comenzarJuego();
     } 
 
     public void inicializarJuego(String nombre) {
     	puntajePartida = new PuntajePartida();
     }
     
-    public void comenzarJuego(int nivel) {
+    public void comenzarJuego() {
     	
         //Nivel
-    	this.nivel = nivel;
+    	//this.nivel = nivel;
     	
         //NavesInvasoras
     	flotaInvasora = new FlotaInvasora();
-    	//iniciarNavesInvasoras();
         
         //Jugador
         jugador = new Jugador();
@@ -60,7 +59,7 @@ public class JuegoControlador {
         iniciarMuro();
         
         //Disparos
-    	proyectiles = new ArrayList<Proyectil>();
+    	//proyectiles = new ArrayList<Proyectil>();
     	
     }
 
@@ -93,10 +92,10 @@ public class JuegoControlador {
 
     public void disparar() {
     	if(!this.jugador.getProyectil().estaActivo()) {
-    		System.out.println("EN CONTROLADOR");
     		this.jugador.disparar();
     	}
-    	this.jugador.getProyectil().avanzar();
+    	while(this.jugador.getProyectil().estaActivo())
+    		this.jugador.getProyectil().avanzar();
     }
 
     public void dispararEnemigo() {
@@ -109,7 +108,6 @@ public class JuegoControlador {
 	    	do {
 		    	col = rand.nextInt(FlotaInvasora.TAMANIO_COLUMNA_NAVES_INVASORAS);
 		    	fil = rand.nextInt(FlotaInvasora.TAMANIO_FILA_NAVES_INVASORAS);
-		    	System.out.println(col + " " + fil);
 	    	} while (!naves.get(col).get(fil).siVive());
 	    	
 	    	if(naves.get(col).get(fil).siVive()) {
@@ -123,28 +121,30 @@ public class JuegoControlador {
     	this.disparoEnemigo.avanzar();
     }
     
+    public void muroAtacado(int bloque, int sentido) {
+    	if(sentido == Proyectil.SENTIDO_DESC)
+    		this.disparoEnemigo.desactivar();
+    	Bloque b = this.bloques.get(bloque);
+    	b.recibiDisparo(sentido);
+    }
+    
     public ProyectilView getDisparoEnemigo() {
     	return this.disparoEnemigo.toView();
     }
-/*
+
     public void incrementarNivel() {
-    	boolean paso = true;
-    	for(NaveInvasora nave : naves)
-    	{
-    		if (nave.siVive())
-    			paso = false;
-    	}
+    	boolean paso = this.flotaInvasora.fueDestruida();
     	
     	if (paso)
     	{
     		nivel++;
-    		this.puntajePartida.incrementarPuntaje(200);
+    		this.puntajePartida.incrementarPuntaje(PuntajePartida.PUNTOS_PASAR_NIVEL);
     		incrementarVida(); // chequear
-    		comenzarJuego(nivel);
+    		reiniciarPartida();
     	}
 
     }
-*/
+
     public void reiniciarPartida() {
     	
         //NavesInvasoras
@@ -154,10 +154,10 @@ public class JuegoControlador {
         bloques = new ArrayList<Bloque>(); 
         iniciarMuro();
         
+        this.jugador.setPosicionX(Jugador.POSICION_INICIAL_X);
+        
         //Disparos
-    	proyectiles = new ArrayList<Proyectil>();
-    	
-    	System.out.println(this.jugador.getVidas());
+    	//proyectiles = new ArrayList<Proyectil>();
     }
 
     public void moverEnemigo() {
@@ -214,14 +214,14 @@ public class JuegoControlador {
     	bloques.clear(); 
     	for(int i=0; i<Bloque.BLOQUES_POR_MURO; i++)
          {
-         	Bloque bloque = new Bloque(i * (Bloque.TAMANIO_LADO + Bloque.ESPACIO_ENTRE_BLOQUES)); //chequear posicion
+         	Bloque bloque = new Bloque(i * (Bloque.TAMANIO_LADO + Bloque.ESPACIO_ENTRE_BLOQUES)); 
          	bloques.add(bloque);        	
          }
     	 
     }
     
     public ArrayList<BloqueView> getMuro() {
-    	ArrayList<BloqueView> result = new ArrayList();
+    	ArrayList<BloqueView> result = new ArrayList<BloqueView>();
     	for(Bloque b : bloques) {
     		result.add(b.toView());
     	}
@@ -232,32 +232,15 @@ public class JuegoControlador {
     public FlotaInvasoraView getFlotaInvasora() {
     	return this.flotaInvasora.toView();
     }
-    /* SE PUEDE BORRAR
-    public ArrayList<ArrayList<NaveInvasoraView>> getNavesInvasoras() {
-  
-    	ArrayList<ArrayList<NaveInvasoraView>> result = new ArrayList<ArrayList<NaveInvasoraView>>();
-    	
-    	for(int i=0; i<TAMANIO_COLUMNA_NAVES_INVASORAS; i++) {
-    		result.add(new ArrayList<NaveInvasoraView>());
-    		
-    		for(int j=0; j<TAMANIO_FILA_NAVES_INVASORAS; j++) {
-    			result.get(i).add(this.naves.get(i).get(j).toView());
-    		}
-    	}
-    	
-    	return result;
-    }*/
     
-
-    public void restarVida() {
-
-    }
-
 
     public void setDificutad(String dificultad) {
     	this.dificultad = dificultad;
     }
+    
+    public void restarVida() {
 
+    }
 
     public void pausar() {
 

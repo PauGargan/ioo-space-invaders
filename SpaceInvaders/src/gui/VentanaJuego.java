@@ -3,6 +3,7 @@ package gui;
 
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -40,6 +41,7 @@ public class VentanaJuego extends JFrame {
 	private static final int velocidad = 90;
 	private int contador = 0;
 	private JLabel JLdisparo = new JLabel();
+	private JLabel JLdisparoE = new JLabel();
 	
 	// CONSTRUCTOR
 	public VentanaJuego () {
@@ -96,7 +98,7 @@ public class VentanaJuego extends JFrame {
 		//	JLbloque.setIcon(new javax.swing.ImageIcon(	getClass().getResource("bloque" + ".png")));
 			JLbloque.setBounds(b.getPosicionX(),b.getPosicionY(),b.getTamanio(),b.getTamanio());
 			JLbloque.setOpaque(true);
-			JLbloque.setBackground(new Color(255, 76, 76, b.getProteccion()));
+			JLbloque.setBackground(new Color(255, 255, 255, b.getProteccion()));
 			JLbloque.setVisible(true);
 			JLbloques.add(JLbloque);
 			c.add(JLbloque);
@@ -131,7 +133,7 @@ public class VentanaJuego extends JFrame {
 	private void eventos() {
 		// TIMER
 		
-		timer = new Timer(15, new ManejoTimer());
+		timer = new Timer(20, new ManejoTimer());
 		timer.start();	
 		
 		//JUGADOR TECLADO
@@ -165,25 +167,24 @@ public class VentanaJuego extends JFrame {
 						JuegoControlador.getInstancia().moverJugadorIzq();
 					}
 				} else if(e.getKeyCode() == 32) {
-					System.out.println("DISPARE");
-					JuegoControlador.getInstancia().disparar();
+					// Disparar jugador
 				}
 			}
 		});
 		
 	}
 	
+	
 	private void mostrarDisparosJugador() {
 		JuegoControlador.getInstancia().disparar();
 		ProyectilView disparo = JuegoControlador.getInstancia().getJugador().getProyectil();
 		
-		//	JLbloque.setIcon(new javax.swing.ImageIcon(	getClass().getResource("bloque" + ".png")));
 		System.out.println(disparo.getPosicionY());
 		JLdisparo.setBounds(disparo.getPosicionX(),disparo.getPosicionY(),5,20);
 		JLdisparo.setOpaque(true);
 		JLdisparo.setBackground(Color.yellow);
 		JLdisparo.setVisible(true);
-		//JLbloques.add(JLbloque);
+
 		Container c = this.getContentPane();
 		c.add(JLdisparo);
 
@@ -194,13 +195,25 @@ public class VentanaJuego extends JFrame {
 		ProyectilView disparo = JuegoControlador.getInstancia().getDisparoEnemigo();
 		
 		System.out.println(disparo.getPosicionY());
-		JLdisparo.setBounds(disparo.getPosicionX(),disparo.getPosicionY(),5,20);
-		JLdisparo.setOpaque(true);
-		JLdisparo.setBackground(Color.pink);
-		JLdisparo.setVisible(true);
+		JLdisparoE.setBounds(disparo.getPosicionX(),disparo.getPosicionY(),5,20);
+		JLdisparoE.setOpaque(true);
+		JLdisparoE.setBackground(Color.pink);
+		JLdisparoE.setVisible(true);
 
 		Container c = this.getContentPane();
-		c.add(JLdisparo);
+		c.add(JLdisparoE);
+		
+		// Choco muro? 
+		ArrayList<BloqueView> bloques = JuegoControlador.getInstancia().getMuro();
+		Rectangle proy = new Rectangle(disparo.getPosicionX(), disparo.getPosicionY(), 5, 20);
+		for(BloqueView b : bloques) {
+			if(b.getProteccion() > 0) {
+				Rectangle bloque = new Rectangle(b.getPosicionX(), b.getPosicionY(), b.getTamanio(), b.getTamanio());
+				if(proy.intersects(bloque)) {
+					JuegoControlador.getInstancia().muroAtacado(bloques.indexOf(b), disparo.getSentido());
+				}
+			}
+		}
 	}
 	
 	class ManejoTimer implements ActionListener{
@@ -220,10 +233,11 @@ public class VentanaJuego extends JFrame {
 			// juego.actualizarDisparos();
 
 			
-		//	juego.incrementarNivel();
+			JuegoControlador.getInstancia().incrementarNivel();
 			
 			//actualizarEnem();
 			//actualizarPosDefensor();
+			mostrarDisparosJugador();
 			mostrarDisparosEnemigos();
 			moverNavesEnemigas();
 			actualizarMuro(); // ex Bloque()
@@ -248,7 +262,7 @@ public class VentanaJuego extends JFrame {
 				
 				gBloque.setBounds(bloque.getPosicionX(), bloque.getPosicionY(), 
 						bloque.getTamanio(),bloque.getTamanio());
-				gBloque.setBackground(new Color(255, 76, 76, bloque.getProteccion()));
+				gBloque.setBackground(new Color(0, 0, 0, bloque.getProteccion()));
 			} else {
 				gBloque.setVisible(false);
 			}
