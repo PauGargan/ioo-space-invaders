@@ -32,9 +32,10 @@ public class Jugador extends ObjetoMovil {
 	}
 	
 	public void disparar() {
-		this.proyectil.setPosicionX(this.posicionX/2);
+		this.proyectil.setPosicionX(this.posicionX + 40);
 		this.proyectil.activar();
 	}
+	
 	
 	public void restarVida() {
 		this.vidas--;
@@ -46,6 +47,10 @@ public class Jugador extends ObjetoMovil {
 	
 	public Proyectil getProyectil() {
 		return this.proyectil;
+	}
+	
+	public void reiniciarProyectil() {
+		this.proyectil = new Proyectil(POSICION_INICIAL_X / 2, POSICION_Y, Proyectil.SENTIDO_ASC);
 	}
 	
 	public JugadorView toView() {

@@ -34,7 +34,7 @@ public class Proyectil {
 	}
 	
 	public void avanzar() {
-		if(this.sentido == SENTIDO_ASC && posicionY > 0) {
+		if(this.sentido == SENTIDO_ASC && posicionY >= 0) {
 			this.posicionY -= velocidad;
 		} else if (this.sentido == SENTIDO_DESC && posicionY < AreaDeJuego.alto) {
 			this.posicionY += velocidad;

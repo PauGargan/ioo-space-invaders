@@ -10,6 +10,7 @@ public class PuntajePartida {
 	
     private int puntaje;
     private int puntajeParaVida;
+    private Tablero tablero;
     
     public PuntajePartida() {
     	puntaje = 0;
@@ -31,6 +32,11 @@ public class PuntajePartida {
 	
 	public boolean mereceNuevaVida() {
 		return puntajeParaVida >= PUNTOS_PARA_NUEVA_VIDA;
+	}
+	
+	public void registrarPuntaje(String nombre)
+	{
+		tablero.agregarOrdenado(puntaje, nombre);
 	}
 }
 

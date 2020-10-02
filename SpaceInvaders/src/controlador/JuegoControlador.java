@@ -89,13 +89,22 @@ public class JuegoControlador {
     	return jugador.getPosicionX();
     }
 
-
-    public void disparar() {
-    	if(!this.jugador.getProyectil().estaActivo()) {
+    public void matarJugador() {
+    	this.jugador.restarVida();
+    	if(this.jugador.siVive())
+    		reiniciarPartida();
+    }
+    
+    public void disparar(boolean nuevoDisparo) {
+    	if(!this.jugador.getProyectil().estaActivo() && nuevoDisparo) {
+    		System.out.println("DISPARO NUEVO");
     		this.jugador.disparar();
-    	}
-    	while(this.jugador.getProyectil().estaActivo())
+    	} else if(this.jugador.getProyectil().estaActivo()) {
     		this.jugador.getProyectil().avanzar();
+    		if(!this.jugador.getProyectil().estaActivo())
+    			this.jugador.reiniciarProyectil();
+    	}
+    	
     }
 
     public void dispararEnemigo() {
@@ -128,11 +137,15 @@ public class JuegoControlador {
     	b.recibiDisparo(sentido);
     }
     
+    public void enemigoAtacado(int col, int fil) {
+    	this.flotaInvasora.getNaves().get(col).get(fil).recibirDisparo();
+    }
+    
     public ProyectilView getDisparoEnemigo() {
     	return this.disparoEnemigo.toView();
     }
 
-    public void incrementarNivel() {
+    public boolean incrementarNivel() {
     	boolean paso = this.flotaInvasora.fueDestruida();
     	
     	if (paso)
@@ -142,11 +155,13 @@ public class JuegoControlador {
     		incrementarVida(); // chequear
     		reiniciarPartida();
     	}
+    	
+    	return paso;
 
     }
 
     public void reiniciarPartida() {
-    	
+    	System.out.println("REINICIANDO");
         //NavesInvasoras
     	flotaInvasora = new FlotaInvasora();
         
@@ -228,11 +243,6 @@ public class JuegoControlador {
     	
     	return result;
     }
-    
-    public FlotaInvasoraView getFlotaInvasora() {
-    	return this.flotaInvasora.toView();
-    }
-    
 
     public void setDificutad(String dificultad) {
     	this.dificultad = dificultad;
@@ -273,6 +283,10 @@ public class JuegoControlador {
     // VIEWS
     public JugadorView getJugador() {
     	return jugador.toView();
+    }
+    
+    public FlotaInvasoraView getFlotaInvasora() {
+    	return flotaInvasora.toView();
     }
     
     public static JuegoControlador getInstancia() { //Singleton ==> referencia static a la misma clase

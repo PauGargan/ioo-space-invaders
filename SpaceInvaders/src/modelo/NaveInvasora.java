@@ -32,6 +32,10 @@ public class NaveInvasora extends ObjetoMovil {
 		this.proyectil.activar();
 	}
 	
+	public void recibirDisparo() {
+		this.vivo = false;
+	}
+	
 	public int getSentido() {
 		return sentido;
 	}

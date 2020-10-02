@@ -18,6 +18,7 @@ import javax.swing.WindowConstants;
 
 import controlador.JuegoControlador;
 import view.BloqueView;
+import view.FlotaInvasoraView;
 import view.JugadorView;
 import view.NaveInvasoraView;
 import view.ProyectilView;
@@ -32,12 +33,12 @@ public class VentanaJuego extends JFrame {
 	private static final int VELOCIDAD_JUGADOR = 20;
 	
 	private Timer timer;
+	private Timer timerDos;
 	private ArrayList<ArrayList<JLabel>> JLnaves = new ArrayList<ArrayList<JLabel>>();
 	private JLabel JLjugador;
-	private JLabel JLpuntaje, JLvidas, JLbloque;
+	private JLabel JLpuntaje, JLvidas;
 	private ArrayList<JLabel> JLproyectil = new ArrayList<>();
 	private ArrayList<JLabel> JLbloques = new ArrayList<>();
-	private static JuegoControlador juego;
 	private static final int velocidad = 90;
 	private int contador = 0;
 	private JLabel JLdisparo = new JLabel();
@@ -95,7 +96,6 @@ public class VentanaJuego extends JFrame {
 		ArrayList<BloqueView> bloques = JuegoControlador.getInstancia().getMuro();
 		for(BloqueView b : bloques) {
 			JLabel JLbloque = new JLabel();
-		//	JLbloque.setIcon(new javax.swing.ImageIcon(	getClass().getResource("bloque" + ".png")));
 			JLbloque.setBounds(b.getPosicionX(),b.getPosicionY(),b.getTamanio(),b.getTamanio());
 			JLbloque.setOpaque(true);
 			JLbloque.setBackground(new Color(255, 255, 255, b.getProteccion()));
@@ -106,7 +106,6 @@ public class VentanaJuego extends JFrame {
 		
 		
 		// NAVES INVASORAS
-		//ArrayList<ArrayList<NaveInvasoraView>> flotaNaves = JuegoControlador.getInstancia().getNavesInvasoras();
 		ArrayList<ArrayList<NaveInvasoraView>> flotaNaves = JuegoControlador.getInstancia().getFlotaInvasora().getNaves();
 		
 		for(int col=0; col < flotaNaves.size(); col++) {
@@ -168,6 +167,11 @@ public class VentanaJuego extends JFrame {
 					}
 				} else if(e.getKeyCode() == 32) {
 					// Disparar jugador
+					//mostrarDisparosJugador();
+
+					JuegoControlador.getInstancia().disparar(true);
+					timerDos = new Timer(15, new ManejoTimerDos());
+					timerDos.start();	
 				}
 			}
 		});
@@ -175,20 +179,6 @@ public class VentanaJuego extends JFrame {
 	}
 	
 	
-	private void mostrarDisparosJugador() {
-		JuegoControlador.getInstancia().disparar();
-		ProyectilView disparo = JuegoControlador.getInstancia().getJugador().getProyectil();
-		
-		System.out.println(disparo.getPosicionY());
-		JLdisparo.setBounds(disparo.getPosicionX(),disparo.getPosicionY(),5,20);
-		JLdisparo.setOpaque(true);
-		JLdisparo.setBackground(Color.yellow);
-		JLdisparo.setVisible(true);
-
-		Container c = this.getContentPane();
-		c.add(JLdisparo);
-
-	}
 	
 	private void mostrarDisparosEnemigos() {
 		JuegoControlador.getInstancia().dispararEnemigo();
@@ -197,13 +187,18 @@ public class VentanaJuego extends JFrame {
 		System.out.println(disparo.getPosicionY());
 		JLdisparoE.setBounds(disparo.getPosicionX(),disparo.getPosicionY(),5,20);
 		JLdisparoE.setOpaque(true);
-		JLdisparoE.setBackground(Color.pink);
+		JLdisparoE.setBackground(Color.red);
 		JLdisparoE.setVisible(true);
 
 		Container c = this.getContentPane();
 		c.add(JLdisparoE);
 		
 		// Choco muro? 
+		chocoMuro(disparo);
+		chocoNaveJugador(disparo);
+	}
+	
+	private void chocoMuro(ProyectilView disparo) {
 		ArrayList<BloqueView> bloques = JuegoControlador.getInstancia().getMuro();
 		Rectangle proy = new Rectangle(disparo.getPosicionX(), disparo.getPosicionY(), 5, 20);
 		for(BloqueView b : bloques) {
@@ -216,12 +211,62 @@ public class VentanaJuego extends JFrame {
 		}
 	}
 	
+	private void chocoNaveJugador(ProyectilView disparo) {
+		JugadorView jugador = JuegoControlador.getInstancia().getJugador();
+		//ArrayList<BloqueView> bloques = JuegoControlador.getInstancia().getMuro();
+		Rectangle proy = new Rectangle(disparo.getPosicionX(), disparo.getPosicionY(), 5, 20);
+		Rectangle juga = new Rectangle(jugador.getPosicionX(), jugador.getPosicionY(), 80, 80);
+		if(proy.intersects(juga)) {
+			System.out.println("INSERSECCION");
+			JuegoControlador.getInstancia().matarJugador();
+		}
+	}
+	
+	private void chocoNaveEnemiga(ProyectilView disparo) {
+		FlotaInvasoraView flota = JuegoControlador.getInstancia().getFlotaInvasora();
+		Rectangle proy = new Rectangle(disparo.getPosicionX(), disparo.getPosicionY(), 5, 20);
+		for(int i=0; i < flota.getNaves().size(); i++) {
+			for(NaveInvasoraView n : flota.getNaves().get(i)) {
+				Rectangle nave = new Rectangle(n.getPosicionX(), n.getPosicionY(), 60, 60);
+				if(proy.intersects(nave)) {
+					JuegoControlador.getInstancia().enemigoAtacado(i, flota.getNaves().get(i).indexOf(n));
+				}
+			}
+		}
+	}
+	
+	class ManejoTimerDos implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JuegoControlador.getInstancia().disparar(false);
+			ProyectilView disparo = JuegoControlador.getInstancia().getJugador().getProyectil();
+			JLdisparo.setBounds(disparo.getPosicionX(),disparo.getPosicionY(),5,20);
+			JLdisparo.setOpaque(true);
+			JLdisparo.setBackground(Color.blue);
+			JLdisparo.setVisible(true);
+
+			Container c = getContentPane();
+			c.add(JLdisparo);
+			
+			// Choco muro? 
+			chocoMuro(disparo);
+			chocoNaveEnemiga(disparo);
+
+			if(!disparo.estaActivo()) {
+				timerDos.stop();
+				JLdisparo.setVisible(false);
+				JLdisparo = new JLabel();
+			}
+		}
+	}
+	
 	class ManejoTimer implements ActionListener{
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			
-			if(JuegoControlador.getInstancia().siGameOver()){
+			if(JuegoControlador.getInstancia().siGameOver()) {
 				timer.stop();
 				JOptionPane.showMessageDialog(null," puntos.", "GAME OVER",JOptionPane.INFORMATION_MESSAGE);
 				//VentanaNombre nombre = new VentanaNombre();
@@ -233,11 +278,13 @@ public class VentanaJuego extends JFrame {
 			// juego.actualizarDisparos();
 
 			
-			JuegoControlador.getInstancia().incrementarNivel();
+			if(JuegoControlador.getInstancia().incrementarNivel()) {
+				configurar();
+			}
 			
 			//actualizarEnem();
 			//actualizarPosDefensor();
-			mostrarDisparosJugador();
+		//	mostrarDisparosJugador();
 			mostrarDisparosEnemigos();
 			moverNavesEnemigas();
 			actualizarMuro(); // ex Bloque()
