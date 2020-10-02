@@ -2,6 +2,7 @@ package controlador;
 
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import modelo.AreaDeJuego;
 import modelo.Bloque;
@@ -15,22 +16,14 @@ import modelo.Tablero;
 import view.BloqueView;
 import view.FlotaInvasoraView;
 import view.JugadorView;
-import view.NaveInvasoraView;
+import view.ProyectilView;
 
 public class JuegoControlador {
-
-
-    private final int TAMANIO_FLOTA_NAVES_INVASORAS = 15;
-    private final int TAMANIO_FILA_NAVES_INVASORAS = 3;
-    private final int TAMANIO_COLUMNA_NAVES_INVASORAS = 5;
-    private final int NAVE_X_INICIAL = 200;
-	private final int NAVE_Y_INICIAL = 0;
     
 	public static  JuegoControlador instancia; // singleton un solo objeto controlador
 	private String dificultad;
     private int cantVida;
     private int nivel = 1;
-    private ArrayList <ArrayList<NaveInvasora>> naves;
     private FlotaInvasora flotaInvasora;
     private ArrayList <Bloque> bloques;
     private ArrayList <Proyectil> proyectiles;
@@ -38,6 +31,7 @@ public class JuegoControlador {
     private Tablero tablero = new Tablero();
     private AreaDeJuego area= new AreaDeJuego();
     private PuntajePartida puntajePartida;
+    private Proyectil disparoEnemigo;
     
     
     
@@ -68,8 +62,6 @@ public class JuegoControlador {
         //Disparos
     	proyectiles = new ArrayList<Proyectil>();
     	
-    	
-
     }
 
  
@@ -81,11 +73,6 @@ public class JuegoControlador {
     public boolean siGameOver() {
     	if(jugador.siVive())
     	{
-    		for(int i=14; i>=0; i--) // verifica si las naves llegaron al jugador
-    		{	
-    			//if(naves.get(i).getPosicionY() > 300)
-	    		return true;
-    		}
     		return false;
     	}
     	else return true;
@@ -105,9 +92,39 @@ public class JuegoControlador {
 
 
     public void disparar() {
+    	if(!this.jugador.getProyectil().estaActivo()) {
+    		System.out.println("EN CONTROLADOR");
+    		this.jugador.disparar();
+    	}
+    	this.jugador.getProyectil().avanzar();
     }
 
     public void dispararEnemigo() {
+    	if(this.disparoEnemigo == null || !this.disparoEnemigo.estaActivo()) {
+	    	ArrayList<ArrayList<NaveInvasora>> naves = this.flotaInvasora.getNaves();
+	    	int col = 0;
+	    	int fil = 0;
+	    	NaveInvasora nave;
+	    	Random rand = new Random();
+	    	do {
+		    	col = rand.nextInt(FlotaInvasora.TAMANIO_COLUMNA_NAVES_INVASORAS);
+		    	fil = rand.nextInt(FlotaInvasora.TAMANIO_FILA_NAVES_INVASORAS);
+		    	System.out.println(col + " " + fil);
+	    	} while (!naves.get(col).get(fil).siVive());
+	    	
+	    	if(naves.get(col).get(fil).siVive()) {
+	    		nave = naves.get(col).get(fil);
+	    		nave.disparar();
+	    		this.disparoEnemigo = nave.getProyectil();
+	    		
+	    	}
+    	}
+    	
+    	this.disparoEnemigo.avanzar();
+    }
+    
+    public ProyectilView getDisparoEnemigo() {
+    	return this.disparoEnemigo.toView();
     }
 /*
     public void incrementarNivel() {
@@ -129,47 +146,41 @@ public class JuegoControlador {
     }
 */
     public void reiniciarPartida() {
-    	nivel = 1; 
+    	
+        //NavesInvasoras
+    	flotaInvasora = new FlotaInvasora();
+        
+        // Muro
+        bloques = new ArrayList<Bloque>(); 
+        iniciarMuro();
+        
+        //Disparos
+    	proyectiles = new ArrayList<Proyectil>();
+    	
+    	System.out.println(this.jugador.getVidas());
     }
 
     public void moverEnemigo() {
+    	boolean hastaMuro = false;
     	
-    	this.flotaInvasora.avanzar();
-    	/*
-    	int bordeIzq = 0;
-    	int bordeDer = 0;
-    	int bordeSup = 0;
-    	int bordeInf = 0;
-    	
-    	bordeIzq = this.naves.get(0).get(0).getPosicionX();
-    	bordeDer = this.naves.get(TAMANIO_COLUMNA_NAVES_INVASORAS-1).get(0).getPosicionX() + 60;
-    	bordeSup = this.naves.get(0).get(0).getPosicionY();
-    	bordeInf = this.naves.get(0).get(TAMANIO_FILA_NAVES_INVASORAS-1).getPosicionY();
-    	    	
-    	for(int i=0; i < this.naves.size(); i++) {
-    		if(this.naves.get(i).get(0).getSentido() == ObjetoMovil.DIR_DERECHA) {
-    			this.naves.get(i).get(0).setSentido(ObjetoMovil.DIR_DERECHA);
-	    		for(int j=0; j < this.naves.get(i).size(); j++) {
-	    			
-	    			this.naves.get(i).get(j).mover(ObjetoMovil.DIR_DERECHA, 3);
-	    			
-	    		}
-	    		bordeDer = this.naves.get(TAMANIO_COLUMNA_NAVES_INVASORAS-1).get(0).getPosicionX() + 60;
-	    		if(bordeDer >= 900) {
-	    			this.naves.get(i).get(0).setSentido(ObjetoMovil.DIR_IZQUIERDA);
-	    		}
-    		} else if(this.naves.get(i).get(0).getSentido() == ObjetoMovil.DIR_IZQUIERDA) {
-				for(int j=0; j < this.naves.get(i).size(); j++) {
-					
-	    			this.naves.get(i).get(j).mover(ObjetoMovil.DIR_IZQUIERDA, 3);
-	    			
-	    		}
-				bordeIzq = this.naves.get(0).get(0).getPosicionX();
-				if(bordeIzq < 900) {
-					this.naves.get(0).get(0).setSentido(ObjetoMovil.DIR_DERECHA);
-				}
-    		}
-    	} */
+    	// Chequear si el muro todavía existe para ver hasta dónde llegan las naves
+    	for(Bloque b : this.bloques) {
+    		if(b.siVivo())
+    			hastaMuro = true;
+    	}
+ 
+    	if(hastaMuro && this.flotaInvasora.getLimiteInferior() < Bloque.POSICION_Y) {
+    		
+    		this.flotaInvasora.avanzar();
+    		
+    	} else if (!hastaMuro && this.flotaInvasora.getLimiteInferior() < Jugador.POSICION_Y) {
+    		
+    		this.flotaInvasora.avanzar();
+    		
+    	} else {
+    		this.jugador.restarVida();
+    		this.reiniciarPartida();
+    	}
     }
 
     public void incrementarVida() {
@@ -216,22 +227,6 @@ public class JuegoControlador {
     	}
     	
     	return result;
-    }
-    
-    public void iniciarNavesInvasoras() {
-    	this.naves = new ArrayList<ArrayList<NaveInvasora>>();
-    	
-    	for(int i=0; i<TAMANIO_COLUMNA_NAVES_INVASORAS; i++) {
-    		
-    		this.naves.add(new ArrayList<NaveInvasora>());
-    		int posX = i * (50 + 10);
-    		
-    		for(int j=0; j<TAMANIO_FILA_NAVES_INVASORAS; j++) {
-    			NaveInvasora n = new NaveInvasora(posX,j* (60+10));
-    			this.naves.get(i).add(n);
-    		}
-    		
-    	}
     }
     
     public FlotaInvasoraView getFlotaInvasora() {

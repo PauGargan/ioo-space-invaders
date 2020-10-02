@@ -19,6 +19,7 @@ import controlador.JuegoControlador;
 import view.BloqueView;
 import view.JugadorView;
 import view.NaveInvasoraView;
+import view.ProyectilView;
 
 
 public class VentanaJuego extends JFrame {
@@ -38,6 +39,7 @@ public class VentanaJuego extends JFrame {
 	private static JuegoControlador juego;
 	private static final int velocidad = 90;
 	private int contador = 0;
+	private JLabel JLdisparo = new JLabel();
 	
 	// CONSTRUCTOR
 	public VentanaJuego () {
@@ -77,7 +79,8 @@ public class VentanaJuego extends JFrame {
 		
 		
 		//VIDAS
-		JLvidas = new JLabel("Vidas: 00"); //String.valueOf(juego.getPuntaje()
+		int vidas = JuegoControlador.getInstancia().getJugador().getVidas();
+		JLvidas = new JLabel("Vidas: " + vidas); //String.valueOf(juego.getPuntaje()
 		//	JLpuntaje.setText("Puntaje: " + String.valueOf(juego.getPuntaje()));  CAMBIAR
 		JLvidas.setBounds(10, 0, 170, 25); 
 		JLvidas.setForeground(new java.awt.Color(21,170,215));
@@ -144,7 +147,6 @@ public class VentanaJuego extends JFrame {
 			public void keyPressed(KeyEvent e) {
 				
 				if( e.getKeyCode() == 39) { // me muevo a la derecha
-					
 					int x = JuegoControlador.getInstancia().moverJugadorDer();
 					
 					if( x < VENTANA_ANCHO - 85 ) {
@@ -162,10 +164,43 @@ public class VentanaJuego extends JFrame {
 					} else {
 						JuegoControlador.getInstancia().moverJugadorIzq();
 					}
+				} else if(e.getKeyCode() == 32) {
+					System.out.println("DISPARE");
+					JuegoControlador.getInstancia().disparar();
 				}
 			}
 		});
 		
+	}
+	
+	private void mostrarDisparosJugador() {
+		JuegoControlador.getInstancia().disparar();
+		ProyectilView disparo = JuegoControlador.getInstancia().getJugador().getProyectil();
+		
+		//	JLbloque.setIcon(new javax.swing.ImageIcon(	getClass().getResource("bloque" + ".png")));
+		System.out.println(disparo.getPosicionY());
+		JLdisparo.setBounds(disparo.getPosicionX(),disparo.getPosicionY(),5,20);
+		JLdisparo.setOpaque(true);
+		JLdisparo.setBackground(Color.yellow);
+		JLdisparo.setVisible(true);
+		//JLbloques.add(JLbloque);
+		Container c = this.getContentPane();
+		c.add(JLdisparo);
+
+	}
+	
+	private void mostrarDisparosEnemigos() {
+		JuegoControlador.getInstancia().dispararEnemigo();
+		ProyectilView disparo = JuegoControlador.getInstancia().getDisparoEnemigo();
+		
+		System.out.println(disparo.getPosicionY());
+		JLdisparo.setBounds(disparo.getPosicionX(),disparo.getPosicionY(),5,20);
+		JLdisparo.setOpaque(true);
+		JLdisparo.setBackground(Color.pink);
+		JLdisparo.setVisible(true);
+
+		Container c = this.getContentPane();
+		c.add(JLdisparo);
 	}
 	
 	class ManejoTimer implements ActionListener{
@@ -173,27 +208,28 @@ public class VentanaJuego extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			
-	/*		if(juego.siGameOver()){
+			if(JuegoControlador.getInstancia().siGameOver()){
 				timer.stop();
-				JOptionPane.showMessageDialog(null,juego.getPuntaje()+" puntos.", "GAME OVER",JOptionPane.INFORMATION_MESSAGE);
-				VentanaNombre nombre = new VentanaNombre();
-				nombre.setVisible(true);
-				nombre.setLocationRelativeTo(null);
+				JOptionPane.showMessageDialog(null," puntos.", "GAME OVER",JOptionPane.INFORMATION_MESSAGE);
+				//VentanaNombre nombre = new VentanaNombre();
+				//nombre.setVisible(true);
+				//nombre.setLocationRelativeTo(null);
 				dispose();
-			}*/
+			}
 			
 			// juego.actualizarDisparos();
-			//actualizarDisparos();
+
 			
 		//	juego.incrementarNivel();
 			
 			//actualizarEnem();
 			//actualizarPosDefensor();
+			mostrarDisparosEnemigos();
 			moverNavesEnemigas();
 			actualizarMuro(); // ex Bloque()
 			
 //			JLpuntaje.setText("Puntaje: " + String.valueOf(juego.getPuntaje()));
-//			JLvidas.setText("Vidas: " + String.valueOf(juego.getVida()));
+			JLvidas.setText("Vidas: " + JuegoControlador.getInstancia().getJugador().getVidas());
 			
 /*			if (contador == velocidad) {
 				juego.dispararEnemigo();

@@ -16,8 +16,8 @@ public class FlotaInvasora {
 	private int limiteDerecho;
 	private int limiteIzquierdo;
 	private int limiteInferior;
-	private int velocidadHorizontal = 3; // Cambiar según nivel
-	private int velocidadVertical = 15;
+	private int velocidadHorizontal = 5; // Cambiar según nivel
+	private int velocidadVertical = 20;
 	
 	private ArrayList <ArrayList<NaveInvasora>> naves;
 	
@@ -98,11 +98,15 @@ public class FlotaInvasora {
 	}
 
 	public int getLimiteInferior() {
-		return this.naves.get(0).get(TAMANIO_FILA_NAVES_INVASORAS-1).getPosicionY();
+		return this.naves.get(0).get(TAMANIO_FILA_NAVES_INVASORAS-1).getPosicionY() + NaveInvasora.TAMANIO;
 	}
 
 	public void setLimiteInferior(int limiteInferior) {
 		this.limiteInferior = limiteInferior;
+	}
+	
+	public ArrayList<ArrayList<NaveInvasora>> getNaves() {
+		return this.naves;
 	}
 	
 	public FlotaInvasoraView toView() {

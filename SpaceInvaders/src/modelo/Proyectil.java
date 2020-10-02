@@ -1,5 +1,7 @@
 package modelo;
 
+import view.ProyectilView;
+
 public class Proyectil {
 
 	public final static int SENTIDO_ASC = 1;
@@ -8,17 +10,38 @@ public class Proyectil {
 	private int posicionX;
 	private int posicionY;
 	private int sentido;
+	private int velocidad;
 	private boolean estado;
 	
 	public Proyectil(int posicionX, int posicionY, int sentido) {
 		this.posicionX = posicionX;
 		this.posicionY = posicionY;
 		this.sentido = sentido;
+		this.estado = false;
+		this.velocidad = 10;
+	}
+	
+	public boolean estaActivo() {
+		return this.estado;
+	}
+	
+	public void activar() {
 		this.estado = true;
 	}
 	
-	public boolean siVivo() {
-		return this.estado;
+	public void desactivar() {
+		this.estado = false;
+	}
+	
+	public void avanzar() {
+		System.out.println("AVANZAR");
+		if(this.sentido == SENTIDO_ASC && posicionY > 0) {
+			this.posicionY -= velocidad;
+		} else if (this.sentido == SENTIDO_DESC && posicionY < AreaDeJuego.alto) {
+			this.posicionY += velocidad;
+		} else {
+			this.estado = false;
+		}
 	}
 
 	public int getPosicionX() {
@@ -45,5 +68,8 @@ public class Proyectil {
 		this.sentido = sentido;
 	}
 	
+	public ProyectilView toView() {
+		return new ProyectilView(this.posicionX, this.posicionY, this.estado);
+	}
 	
 }
